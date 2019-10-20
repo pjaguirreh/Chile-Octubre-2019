@@ -1,8 +1,8 @@
 # Cargar librerías
 
-source("DatosLibrerias.R", encoding = "UTF-8")
+source("Script/DatosLibrerias.R", encoding = "UTF-8")
 
-source("DatosRuizTagle.R")
+source("Script/treemapRT.R")
 
 ui <- fluidPage(
    
@@ -15,14 +15,14 @@ ui <- fluidPage(
          selectInput("indicador",
                      "Seleccione el indicador de interés:",
                      sort(unique(data$indicador)),
-                     selected = "Índice GINI"
+                     selected = "Coeficiente GINI (desigualdad)"
                      ),
          h6("Datos obtenidos desde la web del Banco Mundial: https://data.worldbank.org/indicator"),
          h6("Para cada país se muestra la información correspondiente al último año disponible")
       ),
       
       mainPanel(
-        h4("Indicadores de Chile vs otros países"),
+        h4("Indicadores de Chile vs países OECD"),
         plotlyOutput("graf", height = "550px"),
         h4("Datos de 'Poniendo las cosas en contexto'"),
         h6("Documento escrito por Javier Ruiz-Tagle https://twitter.com/CedeusChile/status/1185940968740184071/photo/1"),
