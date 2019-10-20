@@ -1,72 +1,12 @@
 # Cargar librerías
 
-library(shiny)
-library(dplyr)
-library(tidyr)
-library(ggplot2)
-library(readr)
-library(plotly)
+source("DatosLibrerias.R", encoding = "UTF-8")
 
-# Cargar datos 
-data <- read_csv("WDIData.csv") %>% 
-  select(-"Indicator Code") %>% 
-  
-  # Países OECD
-  filter(`Country Name` %in% c("Australia", "Austria", "Belgium", "Canada", "Chile", "Czech Republic", 
-           "Denmark", "Estonia", "Finland", "France", "Germany", "Greece", "Hungary", 
-           "Iceland", "Ireland", "Israel", "Italy", "Japan", "Latvia", "Lithuania", 
-           "Luxembourg", "Mexico", "Netherlands", "New Zealand", "Norway", "Poland", 
-           "Portugal", "Slovenia", "Spain", "Sweden", "Switzerland", "Turkey", 
-           "United Kingdom", "United States")) %>% 
-  
-  # Indicadores seleccionados
-  filter(`Indicator Name` %in% c("Government expenditure on education, total (% of GDP)",
-                                 "Government expenditure on education, total (% of government expenditure)",
-                                 "Government expenditure per student, primary (% of GDP per capita)",
-                                 "Government expenditure per student, secondary (% of GDP per capita)",
-                                 "Government expenditure per student, tertiary (% of GDP per capita)",
-                                 "Unemployment, total (% of total labor force) (modeled ILO estimate)",
-                                 "Research and development expenditure (% of GDP)",
-                                 "Military expenditure (% of GDP)",
-                                 "GDP per capita, PPP (current international $)")) %>% 
-  
-  # Pasar de "ancho" a "largo"
-  pivot_longer("2012":"2018", names_to = "Year", values_to = "Value") %>% 
-  
-  # Imputación: Dejar en "2018" los últimos valores disponibles para cada país en cada indicador
-  group_by(`Indicator Name`) %>% 
-  fill(Value) %>% 
-  ungroup() %>% 
-  filter(Year == 2018) %>% 
-  
-  # Cambiar nombres de variables a español
-  rename(
-    "país" = "Country Name",
-    `código_país` = "Country Code",
-    "indicador" = "Indicator Name",
-    `año` = "Year",
-    "valor" = "Value"
-  ) %>% 
-  
-  # Cambiar nombres de indicadores a español
-  mutate(
-    indicador = 
-      recode(indicador,
-        "Government expenditure on education, total (% of government expenditure)" = "Gasto en educación, total (% de gasto público)",
-        "Government expenditure on education, total (% of GDP)" = "Gasto en educación, total (% PIB)", 
-        "Government expenditure per student, primary (% of GDP per capita)" = "Gasto en educación por estudiante, primaria (% GDP per capita)",
-        "Government expenditure per student, secondary (% of GDP per capita)" = "Gasto en educación por estudiante, secundaria (% GDP per capita)",
-        "Government expenditure per student, tertiary (% of GDP per capita)" = "Gasto en educación por estudiante, superior (% GDP per capita)",
-        "Military expenditure (% of GDP)" = "Gasto militar (% PIB)",
-        "Research and development expenditure (% of GDP)" = "Gasto en investigación y desarrollo (% PIB)",
-        "Unemployment, total (% of total labor force) (modeled ILO estimate)" = "Desempleo, total (% de la fuerza de trabajo)",
-        "GDP per capita, PPP (current international $)" = "PIB per capita, PPP"),
-    Chile = ifelse(`país` == "Chile", "Si", "No")
-  )
+source("DatosRuizTagle.R")
 
 ui <- fluidPage(
    
-   titlePanel("Indicadores países"),
+   titlePanel("Jornadas de protestas en Chile - Octubre 2019"),
    
    sidebarLayout(
       sidebarPanel(
@@ -74,14 +14,19 @@ ui <- fluidPage(
         # Barra de selección de indicador
          selectInput("indicador",
                      "Seleccione el indicador de interés:",
-                     sort(unique(data$indicador))
+                     sort(unique(data$indicador)),
+                     selected = "Índice GINI"
                      ),
          h6("Datos obtenidos desde la web del Banco Mundial: https://data.worldbank.org/indicator"),
          h6("Para cada país se muestra la información correspondiente al último año disponible")
       ),
       
       mainPanel(
-         plotlyOutput("graf", height = "550px")
+        h4("Indicadores de Chile vs otros países"),
+        plotlyOutput("graf", height = "550px"),
+        h4("Datos de 'Poniendo las cosas en contexto'"),
+        h6("Documento escrito por Javier Ruiz-Tagle https://twitter.com/CedeusChile/status/1185940968740184071/photo/1"),
+        d3tree3Output("d3")
       )
    )
 )
@@ -104,6 +49,10 @@ server <- function(input, output) {
            legend.position = "none"
          )
      )
+   })
+   
+   output$d3 <- renderD3tree3({
+     d
    })
 }
 
