@@ -17,7 +17,10 @@ ui <- fluidPage(
                      sort(unique(data$indicador)),
                      selected = "Coeficiente GINI (desigualdad)"
                      ),
-         h6("Datos obtenidos desde la web del Banco Mundial: https://data.worldbank.org/indicator"),
+         h6("Datos obtenidos desde: https://data.worldbank.org/indicator"),
+         h6("- https://data.worldbank.org/indicator"),
+         h6("- http://hdr.undp.org/en/data"),
+         h6("- https://www.oecd.org/tax/tax-policy/base-de-datos-global-de-estadisticas-tributarias.htm"),
          h6("Para cada país se muestra la información correspondiente al último año disponible")
       ),
       
