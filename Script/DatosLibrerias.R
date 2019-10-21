@@ -136,9 +136,23 @@ ratio <- read_csv("Datos/Ratio of education and health expenditure to military e
                         "Portugal", "Slovenia", "Spain", "Sweden", "Switzerland", "Turkey",
                         "United Kingdom", "United States"))
 
-# Juntar datos Banco Mundial y PNUD
+# Cargar datos OECD
 
-data <- bind_rows(data, presos, suicidios_hombre, suicidios_mujer, ratio)
+impuestos <- read_csv2("Datos/Impuestos.csv") %>% 
+  pivot_longer(2:5, names_to = "indicador", values_to = "valor") %>% 
+  filter(pais %in%  c("Australia", "Austria", "Belgium", "Canada", "Chile", "Czech Republic",
+                        "Denmark", "Estonia", "Finland", "France", "Germany", "Greece", "Hungary",
+                        "Iceland", "Ireland", "Israel", "Italy", "Japan", "Latvia", "Lithuania",
+                        "Luxembourg", "Mexico", "Netherlands", "New Zealand", "Norway", "Poland",
+                        "Portugal", "Slovenia", "Spain", "Sweden", "Switzerland", "Turkey",
+                        "United Kingdom", "United States")) %>% 
+  mutate(Chile = ifelse(pais == "Chile", "Si", "No"),
+         "país" = pais)
+
+
+# Juntar datos Banco Mundial, PNUD, y OECD
+
+data <- bind_rows(data, presos, suicidios_hombre, suicidios_mujer, ratio, impuestos)
 
 # Cargar datos "Ruiz-Tagle"
 ruiz <- read_csv("Datos/RuizTagleOct2019.csv")
