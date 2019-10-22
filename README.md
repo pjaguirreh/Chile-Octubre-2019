@@ -5,7 +5,7 @@ Shiny app creada para contextualizar algunos datos respecto a la realidad de Chi
 
 Por ahora, la app muestra dos cosas:
 
--   Indicadores generales del país respecto a otros (en primera instancia países OECD). Estos datos son extraídos desde:
+-   Indicadores generales del país respecto a otros (OECD y América Latina). Estos datos son extraídos desde:
     -   [Banco Mundial](https://data.worldbank.org/indicator)
     -   [PNUD](http://hdr.undp.org/en/data)
     -   [OECD](https://www.oecd.org/tax/tax-policy/base-de-datos-global-de-estadisticas-tributarias.htm)
