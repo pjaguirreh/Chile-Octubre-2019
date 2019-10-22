@@ -7,16 +7,23 @@ library(plotly)
 library(treemap)
 library(d3treeR)
 
+OECD <- c("Australia", "Austria", "Belgium", "Canada", "Chile", "Czech Republic",
+          "Denmark", "Estonia", "Finland", "France", "Germany", "Greece", "Hungary",
+          "Iceland", "Ireland", "Israel", "Italy", "Japan", "Latvia", "Lithuania",
+          "Luxembourg", "Mexico", "Netherlands", "New Zealand", "Norway", "Poland",
+          "Portugal", "Slovenia", "Spain", "Sweden", "Switzerland", "Turkey",
+          "United Kingdom", "United States")
+
+AL <- c("Argentina", "Bolivia", "Brazil", "Chile", "Colombia", 
+  "Costa Rica", "Cuba", "Dominican Republic", "Ecuador", "Guatemala", 
+  "Honduras", "Mexico", "Nicaragua", "Panama", "Peru", "Paraguay", 
+  "El Salvador", "Uruguay", "Venezuela, RB")
+
 # Cargar datos Banco Mundial
 data <- read_csv("Datos/WDIData.csv") %>% 
   
-  # Países OECD
-  filter(`Country Name` %in% c("Australia", "Austria", "Belgium", "Canada", "Chile", "Czech Republic", 
-                               "Denmark", "Estonia", "Finland", "France", "Germany", "Greece", "Hungary", 
-                               "Iceland", "Ireland", "Israel", "Italy", "Japan", "Latvia", "Lithuania", 
-                               "Luxembourg", "Mexico", "Netherlands", "New Zealand", "Norway", "Poland", 
-                               "Portugal", "Slovenia", "Spain", "Sweden", "Switzerland", "Turkey", 
-                               "United Kingdom", "United States")) %>% 
+  # Países OECD y AL
+  filter(`Country Name` %in% c(OECD, AL)) %>% 
   
   # Indicadores seleccionados
   filter(`Indicator Name` %in% c("Government expenditure on education, total (% of GDP)",
@@ -73,22 +80,18 @@ data <- read_csv("Datos/WDIData.csv") %>%
   ) %>% 
   select(`país`, indicador, valor, Chile)
 
-OECD <- c("Australia", "Austria", "Belgium", "Canada", "Chile", "Czech Republic",
-          "Denmark", "Estonia", "Finland", "France", "Germany", "Greece", "Hungary",
-          "Iceland", "Ireland", "Israel", "Italy", "Japan", "Latvia", "Lithuania",
-          "Luxembourg", "Mexico", "Netherlands", "New Zealand", "Norway", "Poland",
-          "Portugal", "Slovenia", "Spain", "Sweden", "Switzerland", "Turkey",
-          "United Kingdom", "United States")
-
 # Cargar datos PNUD
 
 presos <- read_csv("Datos/Prison population (per 100,000 people).csv",
                    skip = 1) %>% 
-  transmute("país" = recode(Country, "Czechia" = "Czech Republic"),
+  transmute("país" = recode(Country, 
+                            "Czechia" = "Czech Republic",
+                            "Bolivia (Plurinational State of)" = "Bolivia",
+                            "Venezuela (Bolivarian Republic of)" = "Venezuela, RB"),
             indicador = "Población penal (cada 100.000 personas)",
             valor = as.numeric(`2015`),
             Chile = ifelse(`país` == "Chile", "Si", "No")) %>% 
-  filter(`país` %in%  OECD)
+  filter(`país` %in% c(OECD, AL))
 
 suicidios_mujer <- read_csv("Datos/Suicide rate, female (per 100,000 people).csv",
                             skip = 1) %>% 
@@ -96,7 +99,7 @@ suicidios_mujer <- read_csv("Datos/Suicide rate, female (per 100,000 people).csv
             indicador = "Tasa de suicidios, mujeres (cada 100.000 personas)",
             valor = as.numeric(`2015`),
             Chile = ifelse(`país` == "Chile", "Si", "No")) %>% 
-  filter(`país` %in%  OECD)
+  filter(`país` %in%  c(OECD, AL))
 
 suicidios_hombre <- read_csv("Datos/Suicide rate, male (per 100,000 people).csv",
                              skip = 1) %>% 
@@ -104,7 +107,7 @@ suicidios_hombre <- read_csv("Datos/Suicide rate, male (per 100,000 people).csv"
             indicador = "Tasa de suicidios, hombres (cada 100.000 personas)",
             valor = as.numeric(`2015`),
             Chile = ifelse(`país` == "Chile", "Si", "No")) %>% 
-  filter(`país` %in%  OECD)
+  filter(`país` %in%  c(OECD, AL))
 
 ratio <- read_csv("Datos/Ratio of education and health expenditure to military expenditure.csv",
                   skip = 1) %>% 
@@ -121,24 +124,26 @@ ratio <- read_csv("Datos/Ratio of education and health expenditure to military e
               is.na(valor3) & is.na(valor2) & !is.na(valor1) ~ valor1
             ),
             Chile = ifelse(`país` == "Chile", "Si", "No")) %>% 
-  filter(`país` %in%  OECD)
+  filter(`país` %in%  c(OECD, AL))
 
 # Cargar datos OECD
 
 impuestos <- read_csv2("Datos/Impuestos.csv") %>% 
   pivot_longer(2:5, names_to = "indicador", values_to = "valor") %>% 
-  filter(pais %in%  OECD) %>% 
+  filter(pais %in%  c(OECD, AL)) %>% 
   mutate(Chile = ifelse(pais == "Chile", "Si", "No"),
          "país" = pais) %>% 
   select(-pais)
-
 
 # Juntar datos Banco Mundial, PNUD, y OECD
 
 data <- bind_rows(data, presos, suicidios_hombre, suicidios_mujer, ratio, impuestos) %>% 
   mutate(
-    OECD = ifelse(`país` %in% OECD, "Si", "No")
+    OECD = ifelse(`país` %in% OECD, "Si", "No"),
+    AL = ifelse(`país` %in% AL, "Si", "No")
     )
+
+rm(presos, suicidios_hombre, suicidios_mujer, ratio, impuestos)
 
 # Cargar datos "Ruiz-Tagle"
 ruiz <- read_csv("Datos/RuizTagleOct2019.csv")
