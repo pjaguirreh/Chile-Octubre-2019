@@ -11,6 +11,6 @@ Por ahora, la app muestra dos cosas:
     -   [OECD](https://www.oecd.org/tax/tax-policy/base-de-datos-global-de-estadisticas-tributarias.htm)
 -   Información sintetizada por el profesor Javier Ruiz-Tagle (Instituto de Estudios Urbanos y Territoriales - PUC) en un documento titulado [Poniendo las cosas en contexto](https://twitter.com/CedeusChile/status/1185940968740184071/photo/1)
 
-[LINK A LA APP](https://pabloaguirreh.shinyapps.io/Indicadores2019/)
+[LINK A LA APP](https://pabloaguirreh.shinyapps.io/Chile-Octubre-2019-master/?_ga=2.196880297.462566253.1620915282-2107694498.1620915282)
 
 **EN DESARROLLO**
